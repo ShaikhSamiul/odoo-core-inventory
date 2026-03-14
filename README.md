@@ -54,28 +54,6 @@ The core engine of the app. It tracks where stock comes from, where it goes, and
 * **Otp:NodeMailer
 
 ---
-
-## 📂 Project Structure
-
-```text
-core-inventory/
-├── backend/
-│   ├── config/           # Database connection
-│   ├── controllers/      # Business logic & stock math (operationController.js)
-│   ├── models/           # Mongoose schemas (Product.js, Operation.js)
-│   ├── routes/           # API routes (/api/operations, /api/products)
-│   ├── .env              # Backend environment variables
-│   └── server.js         # Entry point
-│
-└── frontend/
-    ├── src/
-    │   ├── components/   # Reusable UI (Sidebar, Layout)
-    │   ├── pages/        # Main views (Dashboard, Products, Operations.jsx)
-    │   ├── App.jsx       # Routing logic
-    │   └── index.css     # Global styles & Tailwind resets
-    ├── package.json
-    └── vite.config.js
-
 💻 Installation & Local Setup
 Prerequisites
 Node.js (v16+ recommended)
@@ -129,3 +107,27 @@ POST / - Adds a new product to the master catalog.
 Inventory Managers: Oversee the ledger, manage incoming/outgoing stock, monitor low-stock KPIs, and perform manual adjustments.
 
 Warehouse Staff: Perform day-to-day physical operations like picking, packing, receiving vendor shipments, and physical counting.
+
+
+## 📂 Project Structure
+
+```text
+core-inventory/
+├── backend/
+│   ├── config/           # Database connection
+│   ├── controllers/      # Business logic & stock math (operationController.js)
+│   ├── models/           # Mongoose schemas (Product.js, Operation.js)
+│   ├── routes/           # API routes (/api/operations, /api/products)
+│   ├── .env              # Backend environment variables
+│   └── server.js         # Entry point
+│
+└── frontend/
+    ├── src/
+    │   ├── components/   # Reusable UI (Sidebar, Layout)
+    │   ├── pages/        # Main views (Dashboard, Products, Operations.jsx)
+    │   ├── App.jsx       # Routing logic
+    │   └── index.css     # Global styles & Tailwind resets
+    ├── package.json
+    └── vite.config.js
+
+

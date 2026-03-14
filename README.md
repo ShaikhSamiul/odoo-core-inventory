@@ -51,7 +51,7 @@ The core engine of the app. It tracks where stock comes from, where it goes, and
 * **Backend:** Node.js, Express.js
 * **Database:** MongoDB (Mongoose ODM)
 * **HTTP Client:** Axios
-* **Otp:NodeMailer
+* **Otp:** NodeMailer
 
 ---
 💻 Installation & Local Setup
@@ -61,36 +61,46 @@ Node.js (v16+ recommended)
 MongoDB (Local instance or MongoDB Atlas URI)
 
 1. Clone the repository
-Bash
-git clone [https://github.com/yourusername/core-inventory.git](https://github.com/yourusername/core-inventory.git)
+```
+bash
+git clone https://github.com/ShaikhSamiul/odoo-core-inventory.git
+```
+```
 cd core-inventory
+```
 2. Backend Setup
 Open a terminal and navigate to the backend folder:
-
+```
 Bash
 cd backend
 npm install
+```
 Create a .env file in the backend directory:
 
 Code snippet
+```
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_super_secret_key
+```
 Start the backend server:
-
+```
 Bash
 npm run dev
+```
 # Server should log: "Server running on port 5000"
 3. Frontend Setup
 Open a new terminal window and navigate to the frontend folder:
-
+```
 Bash
 cd frontend
 npm install
+```
 Start the frontend development server:
-
+```
 Bash
 npm run dev
+```
 # App will typically run on http://localhost:5173
 🔌 Core API Endpoints
 Operations /api/operations

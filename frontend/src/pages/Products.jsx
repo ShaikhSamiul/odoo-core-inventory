@@ -6,14 +6,17 @@ import styles from './Products.module.css';
 
 export default function Products() {
     const [products, setProducts] = useState([]);
+    const [warehouses, setWarehouses] = useState([]); // NEW: State to hold warehouse list
     const [isModalOpen, setIsModalOpen] = useState(false);
     
+    // UPDATED: Replaced 'location' string with 'warehouse' ID
     const [formData, setFormData] = useState({
-        name: '', sku: '', category: 'Laptops', uom: 'Pcs', stock: 0, lowStockThreshold: 10, location: 'Warehouse 1'
+        name: '', sku: '', category: 'Laptops', uom: 'Pcs', stock: 0, lowStockThreshold: 10, warehouse: ''
     });
 
     useEffect(() => {
         fetchProducts();
+        fetchWarehouses(); // NEW: Fetch warehouses when page loads
     }, []);
 
     const fetchProducts = async () => {
@@ -22,6 +25,16 @@ export default function Products() {
             setProducts(response.data);
         } catch (error) {
             console.error("Error fetching products:", error);
+        }
+    };
+
+    // NEW: Function to pull warehouses for the dropdown
+    const fetchWarehouses = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/warehouses');
+            setWarehouses(response.data);
+        } catch (error) {
+            console.error("Error fetching warehouses:", error);
         }
     };
 
@@ -35,7 +48,8 @@ export default function Products() {
             await axios.post('http://localhost:5000/api/products', formData);
             fetchProducts();
             setIsModalOpen(false);
-            setFormData({ name: '', sku: '', category: 'Laptops', uom: 'Pcs', stock: 0, lowStockThreshold: 10, location: 'Warehouse 1' });
+            // Reset form
+            setFormData({ name: '', sku: '', category: 'Laptops', uom: 'Pcs', stock: 0, lowStockThreshold: 10, warehouse: '' });
         } catch (error) {
             console.error("Error saving product:", error);
             alert("Failed to save product.");
@@ -70,7 +84,8 @@ export default function Products() {
                                 <td>{product.category}</td>
                                 <td>
                                     <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium">
-                                        {product.location}
+                                        {/* UPDATED: Displays populated warehouse name */}
+                                        {product.warehouse?.name || 'Unassigned'}
                                     </span>
                                 </td>
                                 <td>
@@ -87,7 +102,7 @@ export default function Products() {
             {/* Add Product Modal */}
             {isModalOpen && (
                 <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent} style={{ maxWidth: '600px' }}> {/* Widened slightly for 3 columns */}
+                    <div className={styles.modalContent} style={{ maxWidth: '600px' }}>
                         <h2 className={styles.modalTitle}>Add Electronics Item</h2>
                         
                         <form onSubmit={handleSubmit}>
@@ -113,14 +128,15 @@ export default function Products() {
                                 </div>
                             </div>
 
-                            {/* THE FIX: 3 Columns for Warehouse, Stock, and Low Stock Alert */}
                             <div className="flex gap-4 mb-4">
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>Warehouse</label>
-                                    <select name="location" value={formData.location} onChange={handleInputChange} className={styles.formInput}>
-                                        <option value="Warehouse 1">Warehouse 1</option>
-                                        <option value="Warehouse 2">Warehouse 2</option>
-                                        <option value="Warehouse 3">Warehouse 3</option>
+                                    {/* UPDATED: Dynamically loops through the real MongoDB warehouses */}
+                                    <select name="warehouse" value={formData.warehouse} onChange={handleInputChange} className={styles.formInput} required>
+                                        <option value="" disabled>Select a Warehouse...</option>
+                                        {warehouses.map((wh) => (
+                                            <option key={wh._id} value={wh._id}>{wh.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>

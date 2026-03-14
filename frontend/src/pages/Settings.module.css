@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  max-width: 900px;
+  /* Removed max-width to allow the two columns to breathe */
 }
 
 .pageTitle {
@@ -43,6 +43,14 @@
   border-bottom: 2px solid #2563eb;
 }
 
+/* 2-Column Grid */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
 /* Card & Form Styles */
 .card {
   background-color: #ffffff;
@@ -50,6 +58,15 @@
   padding: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.75rem;
 }
 
 .description {
@@ -62,7 +79,6 @@
 .formGrid {
   display: grid;
   gap: 1.5rem;
-  max-width: 500px;
 }
 
 .formGroup {
@@ -110,3 +126,61 @@
 .submitBtn:hover {
   background-color: #1d4ed8;
 }
+
+/* List & Accordion Styles (Right Side) */
+.listItem {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  background-color: #f8fafc;
+}
+
+.itemName {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.itemCode {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.accordionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.accordionHeader:hover {
+  background-color: #f1f5f9;
+}
+
+.accordionContent {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  background-color: #ffffff;
+}
+
+.emptyState {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 1rem;
+}
+

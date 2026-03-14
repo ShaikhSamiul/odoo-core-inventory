@@ -4,7 +4,6 @@ const Product = require('../models/product');
 
 exports.getDashboardData = async (req, res) => {
     try {
-        // 1. Calculate all 5 KPIs
         const totalProducts = await Product.countDocuments();
         const lowStock = await Product.countDocuments({ $expr: { $lte: ["$stock", "$lowStockThreshold"] } });
         
@@ -12,9 +11,13 @@ exports.getDashboardData = async (req, res) => {
         const pendingDeliveries = await Operation.countDocuments({ type: 'Delivery', status: { $in: ['Draft', 'Waiting', 'Ready'] } });
         const internalTransfers = await Operation.countDocuments({ type: 'Internal', status: { $in: ['Draft', 'Waiting', 'Ready'] } });
 
-        // 2. Fetch Operations for the list (populated with product details for filtering)
+        // UPDATED: Deep populate to get the warehouse name inside the product
         const recentOperations = await Operation.find()
-            .populate('product', 'name sku category location uom')
+            .populate({
+                path: 'product',
+                select: 'name sku category uom',
+                populate: { path: 'warehouse', select: 'name' }
+            })
             .sort({ createdAt: -1 });
 
         res.status(200).json({
@@ -44,7 +47,10 @@ exports.createOperation = async (req, res) => {
                 prod.stock -= Number(quantity);
             } 
             else if (type === 'Adjustment') prod.stock = Number(quantity); 
-            else if (type === 'Internal') prod.location = toLocation;
+            else if (type === 'Internal') {
+                // UPDATED: Internal transfers now move the product to the new Warehouse ID
+                prod.warehouse = toLocation;
+            }
             
             await prod.save();
         }
@@ -58,7 +64,14 @@ exports.createOperation = async (req, res) => {
 
 exports.getAllOperations = async (req, res) => {
     try {
-        const operations = await Operation.find().populate('product', 'name sku category').sort({ createdAt: -1 });
+        // UPDATED: Deep populate here as well
+        const operations = await Operation.find()
+            .populate({
+                path: 'product',
+                select: 'name sku category',
+                populate: { path: 'warehouse', select: 'name' }
+            })
+            .sort({ createdAt: -1 });
         res.status(200).json(operations);
     } catch (error) {
         res.status(500).json({ error: error.message });

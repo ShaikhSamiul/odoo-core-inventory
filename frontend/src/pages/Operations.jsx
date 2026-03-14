@@ -2,28 +2,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus } from 'lucide-react';
-// Reusing the Products CSS module for consistency and clean UI!
 import styles from './Products.module.css';
 
 export default function Operations() {
     const [operations, setOperations] = useState([]);
     const [products, setProducts] = useState([]);
+    const [warehouses, setWarehouses] = useState([]); // NEW: State for Warehouses
     const [isModalOpen, setIsModalOpen] = useState(false);
     
-    // Form state for logging a new operation
     const [formData, setFormData] = useState({
         type: 'Receipt',
         product: '',
         quantity: 1,
         fromLocation: 'Vendor',
-        toLocation: 'Warehouse 1',
+        toLocation: '', // Will map to a Warehouse ID
         status: 'Done',
         reference: ''
     });
 
     useEffect(() => {
         fetchOperations();
-        fetchProducts(); // We need the product list for the dropdown
+        fetchProducts();
+        fetchWarehouses(); // NEW: Fetch warehouses on load
     }, []);
 
     const fetchOperations = async () => {
@@ -39,13 +39,41 @@ export default function Operations() {
         try {
             const response = await axios.get('http://localhost:5000/api/products');
             setProducts(response.data);
-            // Set the default product in the dropdown to the first product available
             if (response.data.length > 0) {
                 setFormData(prev => ({ ...prev, product: response.data[0]._id }));
             }
         } catch (error) {
             console.error("Error fetching products:", error);
         }
+    };
+
+    // NEW: Fetch Warehouses
+    const fetchWarehouses = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/warehouses');
+            setWarehouses(response.data);
+            if (response.data.length > 0) {
+                setFormData(prev => ({ ...prev, toLocation: response.data[0]._id }));
+            }
+        } catch (error) {
+            console.error("Error fetching warehouses:", error);
+        }
+    };
+
+    // Dynamically handle form changes to reset From/To fields based on type
+    const handleTypeChange = (e) => {
+        const newType = e.target.value;
+        const defaultWh = warehouses.length > 0 ? warehouses[0]._id : '';
+        
+        let from = '';
+        let to = '';
+
+        if (newType === 'Receipt') { from = 'Vendor'; to = defaultWh; }
+        else if (newType === 'Delivery') { from = defaultWh; to = 'Customer'; }
+        else if (newType === 'Internal') { from = defaultWh; to = defaultWh; }
+        else if (newType === 'Adjustment') { from = defaultWh; to = 'N/A'; }
+
+        setFormData({ ...formData, type: newType, fromLocation: from, toLocation: to });
     };
 
     const handleInputChange = (e) => {
@@ -55,31 +83,28 @@ export default function Operations() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Send the operation to the backend
             await axios.post('http://localhost:5000/api/operations', formData);
+            fetchOperations();
+            fetchProducts(); // Refresh products to show updated stock!
+            setIsModalOpen(false);
             
-            fetchOperations(); // Refresh the ledger table
-            setIsModalOpen(false); // Close the modal
-            
-            // Reset form
             setFormData({
                 type: 'Receipt',
                 product: products[0]?._id || '',
                 quantity: 1,
                 fromLocation: 'Vendor',
-                toLocation: 'Warehouse 1',
+                toLocation: warehouses[0]?._id || '',
                 status: 'Done',
                 reference: ''
             });
             
-            alert("Operation logged and stock updated successfully!");
+            alert("Operation logged successfully!");
         } catch (error) {
             console.error("Error saving operation:", error);
-            alert("Failed to save operation. Check console.");
+            alert(error.response?.data?.message || "Failed to save operation.");
         }
     };
 
-    // Helper to format dates
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
@@ -93,7 +118,6 @@ export default function Operations() {
                 </button>
             </div>
 
-            {/* Operations Ledger Table */}
             <div className={styles.tableContainer}>
                 <table className={styles.productTable}>
                     <thead>
@@ -102,6 +126,7 @@ export default function Operations() {
                             <th>Type</th>
                             <th>Reference</th>
                             <th>Product</th>
+                            <th>Warehouse</th>
                             <th>Qty</th>
                             <th>Status</th>
                         </tr>
@@ -113,7 +138,8 @@ export default function Operations() {
                                 <td className="font-semibold text-gray-700">{op.type}</td>
                                 <td>{op.reference || '-'}</td>
                                 <td className="text-blue-600 font-medium">{op.product?.name}</td>
-                                <td className="font-bold">{op.type === 'Delivery' ? '-' : '+'}{op.quantity}</td>
+                                <td className="text-gray-600">{op.product?.warehouse?.name || 'Unknown'}</td>
+                                <td className="font-bold">{op.type === 'Delivery' || op.type === 'Adjustment' && op.quantity < 0 ? '-' : '+'}{Math.abs(op.quantity)}</td>
                                 <td>
                                     <span className={`px-2 py-1 rounded text-xs font-bold ${op.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                         {op.status}
@@ -125,7 +151,6 @@ export default function Operations() {
                 </table>
             </div>
 
-            {/* Add Operation Modal */}
             {isModalOpen && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent} style={{ maxWidth: '600px' }}>
@@ -135,7 +160,7 @@ export default function Operations() {
                             <div className="flex gap-4 mb-4">
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>Operation Type</label>
-                                    <select name="type" value={formData.type} onChange={handleInputChange} className={styles.formInput}>
+                                    <select name="type" value={formData.type} onChange={handleTypeChange} className={styles.formInput}>
                                         <option value="Receipt">Incoming Receipt (Vendor)</option>
                                         <option value="Delivery">Outgoing Delivery (Customer)</option>
                                         <option value="Internal">Internal Transfer</option>
@@ -145,9 +170,9 @@ export default function Operations() {
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>Status</label>
                                     <select name="status" value={formData.status} onChange={handleInputChange} className={styles.formInput}>
-                                        <option value="Done">Done (Updates Stock Immediately)</option>
-                                        <option value="Draft">Draft (No Stock Change)</option>
-                                        <option value="Waiting">Waiting (No Stock Change)</option>
+                                        <option value="Done">Done (Updates Stock)</option>
+                                        <option value="Draft">Draft (No Change)</option>
+                                        <option value="Waiting">Waiting (No Change)</option>
                                     </select>
                                 </div>
                             </div>
@@ -156,7 +181,9 @@ export default function Operations() {
                                 <label>Select Product</label>
                                 <select name="product" value={formData.product} onChange={handleInputChange} className={styles.formInput} required>
                                     {products.map(p => (
-                                        <option key={p._id} value={p._id}>{p.name} (Current Stock: {p.stock})</option>
+                                        <option key={p._id} value={p._id}>
+                                            {p.name} — Stock: {p.stock} ({p.warehouse?.name})
+                                        </option>
                                     ))}
                                 </select>
                             </div>
@@ -172,14 +199,32 @@ export default function Operations() {
                                 </div>
                             </div>
 
+                            {/* DYNAMIC FROM/TO LOCATIONS */}
                             <div className="flex gap-4 mb-4">
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>From Location</label>
-                                    <input type="text" name="fromLocation" value={formData.fromLocation} onChange={handleInputChange} className={styles.formInput} />
+                                    {formData.type === 'Receipt' ? (
+                                        <input type="text" value="Vendor" readOnly className={styles.formInput} style={{backgroundColor: '#f1f5f9', color: '#64748b'}} />
+                                    ) : (
+                                        <select name="fromLocation" value={formData.fromLocation} onChange={handleInputChange} className={styles.formInput} required>
+                                            <option value="" disabled>Select Warehouse...</option>
+                                            {warehouses.map(wh => <option key={wh._id} value={wh._id}>{wh.name}</option>)}
+                                        </select>
+                                    )}
                                 </div>
+                                
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>To Location</label>
-                                    <input type="text" name="toLocation" value={formData.toLocation} onChange={handleInputChange} className={styles.formInput} />
+                                    {formData.type === 'Delivery' ? (
+                                        <input type="text" value="Customer" readOnly className={styles.formInput} style={{backgroundColor: '#f1f5f9', color: '#64748b'}} />
+                                    ) : formData.type === 'Adjustment' ? (
+                                        <input type="text" value="N/A" readOnly className={styles.formInput} style={{backgroundColor: '#f1f5f9', color: '#64748b'}} />
+                                    ) : (
+                                        <select name="toLocation" value={formData.toLocation} onChange={handleInputChange} className={styles.formInput} required>
+                                            <option value="" disabled>Select Warehouse...</option>
+                                            {warehouses.map(wh => <option key={wh._id} value={wh._id}>{wh.name}</option>)}
+                                        </select>
+                                    )}
                                 </div>
                             </div>
 

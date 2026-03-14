@@ -1,0 +1,231 @@
+/* frontend/src/pages/MoveHistory.module.css */
+
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.newBtn {
+  background-color: transparent;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.newBtn:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.iconBtn:hover, .activeIcon {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Table Styles */
+.tableContainer {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Wireframe Color Coding Rules */
+.rowIn {
+  color: #15803d; /* Dark Green */
+}
+
+.rowIn:hover {
+  background-color: #f0fdf4; /* Light Green Bg on hover */
+}
+
+.rowOut {
+  color: #b91c1c; /* Dark Red */
+}
+
+.rowOut:hover {
+  background-color: #fef2f2; /* Light Red Bg on hover */
+}
+
+.rowNeutral {
+  color: #334155;
+}
+
+.rowNeutral:hover {
+  background-color: #f8fafc;
+}
+
+/* --- NEW SEARCH INPUT STYLES --- */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  transition: border-color 0.2s;
+}
+
+.searchContainer:focus-within {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+}
+
+.searchInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  width: 200px;
+}
+
+/* --- KANBAN BOARD STYLES --- */
+.kanbanContainer {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  min-height: 60vh;
+}
+
+.kanbanColumn {
+  flex: 0 0 280px; /* Fixed width for columns */
+  background-color: #f1f5f9; /* Light gray background like Trello */
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.kanbanHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.badgeCount {
+  background-color: #e2e8f0;
+  color: #475569;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+}
+
+.kanbanCard {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  margin-bottom: 0.75rem;
+  border-left: 4px solid #cbd5e1;
+  cursor: grab;
+}
+
+.kanbanCard:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.cardIn { border-left-color: #15803d; }
+.cardOut { border-left-color: #b91c1c; }
+
+.cardRef {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.cardContact {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.cardDetails {
+  font-size: 0.8rem;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8fafc;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}

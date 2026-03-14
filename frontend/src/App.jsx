@@ -6,7 +6,7 @@ import Products from './pages/Products';
 import Settings from './pages/Settings';
 import Operations from './pages/Operations'
 import styles from './components/Layout.module.css';
-
+import MoveHistory from './pages/MoveHistory';
 
 function App() {
   return (
@@ -18,6 +18,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/products" element={<Products />} />
               <Route path="/Operations" element={<Operations />} />
+              <Route path="/history" element={<MoveHistory />} />
               {<Route path="/settings" element={<Settings />} /> }
               {/* You will add Operations and MoveHistory routes here later */}
             </Routes>

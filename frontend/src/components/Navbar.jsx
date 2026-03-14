@@ -1,34 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ArrowRightLeft, Package, History, Settings, User, X, LogIn } from 'lucide-react';
+import { LayoutDashboard, ArrowRightLeft, Package, History, Settings, User, X, LogIn, Bell } from 'lucide-react';
+import axios from 'axios';
 import styles from './Layout.module.css';
 
 export default function Navbar() {
     const location = useLocation();
     const navigate = useNavigate();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    
+    // Notification States
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
+    const [lowStockItems, setLowStockItems] = useState([]);
 
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
-    
-    // --- THE LOGIC TO GET USER DATA ---
     const [userData, setUserData] = useState(JSON.parse(localStorage.getItem('inventoryUser')) || {});
 
     useEffect(() => {
+        // Fetch notifications if logged in
+        if (isLoggedIn) {
+            fetchNotifications();
+        }
+
         const handleAuthChange = () => {
-            setIsLoggedIn(!!localStorage.getItem('token'));
-            // Refresh user data when login happens
+            const loggedIn = !!localStorage.getItem('token');
+            setIsLoggedIn(loggedIn);
             setUserData(JSON.parse(localStorage.getItem('inventoryUser')) || {});
+            if (loggedIn) fetchNotifications();
         };
 
         window.addEventListener('storage', handleAuthChange);
         return () => window.removeEventListener('storage', handleAuthChange);
-    }, []);
+    }, [isLoggedIn]);
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await axios.get('http://localhost:5000/api/products');
+            // Logic: Filter items where stock is less than or equal to threshold
+            const alerts = res.data.filter(p => p.stock <= (p.lowStockThreshold || 5));
+            setLowStockItems(alerts);
+        } catch (err) {
+            console.error("Error fetching notifications", err);
+        }
+    };
 
     const handleSignOut = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('inventoryUser');
         setIsLoggedIn(false);
         setIsDrawerOpen(false);
+        setIsNotifOpen(false);
         navigate('/login');
     };
 
@@ -64,20 +85,79 @@ export default function Navbar() {
                     )}
                 </div>
                 
-                {!isLoggedIn ? (
-                    <Link to="/login" className={styles.profileBtn} style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}>
-                        <LogIn size={20} />
-                        <span>Sign In</span>
-                    </Link>
-                ) : (
-                    /* DISPLAY USER NAME IN NAVBAR */
-                    <button onClick={() => setIsDrawerOpen(true)} className={styles.profileBtn}>
-                        <div style={{ backgroundColor: '#e2e8f0', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '4px' }}>
-                            <User size={16} color="#475569" />
-                        </div>
-                        <span style={{ fontWeight: '600' }}>{userData.name || "Profile"}</span>
-                    </button>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {!isLoggedIn ? (
+                        <Link to="/login" className={styles.profileBtn} style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}>
+                            <LogIn size={20} />
+                            <span>Sign In</span>
+                        </Link>
+                    ) : (
+                        <>
+                            {/* NOTIFICATION SECTION */}
+                            <div style={{ position: 'relative', cursor: 'pointer' }}>
+                                <Bell 
+                                    size={20} 
+                                    color="#475569" 
+                                    onClick={() => setIsNotifOpen(!isNotifOpen)} 
+                                />
+                                {lowStockItems.length > 0 && (
+                                    <span style={{
+                                        position: 'absolute',
+                                        top: '-5px',
+                                        right: '-5px',
+                                        backgroundColor: '#ef4444',
+                                        color: 'white',
+                                        fontSize: '10px',
+                                        padding: '2px 5px',
+                                        borderRadius: '50%',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        {lowStockItems.length}
+                                    </span>
+                                )}
+
+                                {isNotifOpen && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '35px',
+                                        right: '0',
+                                        width: '260px',
+                                        backgroundColor: 'white',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                                        zIndex: 1000,
+                                        padding: '12px'
+                                    }}>
+                                        <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', fontSize: '14px', borderBottom: '1px solid #f1f5f9', paddingBottom: '5px' }}>
+                                            Notifications
+                                        </p>
+                                        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                            {lowStockItems.length === 0 ? (
+                                                <p style={{ fontSize: '12px', color: '#64748b', textAlign: 'center' }}>No low stock alerts</p>
+                                            ) : (
+                                                lowStockItems.map(item => (
+                                                    <div key={item._id} style={{ padding: '8px 0', borderBottom: '1px solid #f8fafc', fontSize: '12px' }}>
+                                                        ⚠️ <strong>{item.name}</strong> is low! <br/>
+                                                        Current count: <span style={{ color: '#ef4444', fontWeight: 'bold' }}>{item.stock}</span>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* PROFILE BUTTON */}
+                            <button onClick={() => setIsDrawerOpen(true)} className={styles.profileBtn}>
+                                <div style={{ backgroundColor: '#e2e8f0', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '4px' }}>
+                                    <User size={16} color="#475569" />
+                                </div>
+                                <span style={{ fontWeight: '600' }}>{userData.name || "Profile"}</span>
+                            </button>
+                        </>
+                    )}
+                </div>
             </header>
 
             {isDrawerOpen && (
@@ -98,18 +178,11 @@ export default function Navbar() {
                                 {userData.name ? userData.name.charAt(0).toUpperCase() : 'U'}
                             </span>
                         </div>
-                        {/* DISPLAY USER NAME AND EMAIL IN DRAWER */}
                         <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>
                             {userData.name}
                         </h4>
                         <p style={{ color: '#64748b', fontSize: '0.875rem' }}>{userData.email}</p>
                     </div>
-
-                    {/* <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <p style={{ fontWeight: 600, color: '#475569', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Account</p>
-                        <button className={styles.actionBtn}>Profile Settings</button>
-                        <button className={styles.actionBtn}>Security & Password</button>
-                    </div> */}
 
                     <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
                         <button className={styles.logoutBtn} onClick={handleSignOut}>Sign Out</button>

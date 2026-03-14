@@ -10,7 +10,6 @@ export default function Sidebar() {
         { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
         { name: 'Products', path: '/products', icon: <Package size={20} /> },
         { name: 'Operations', path: '/operations', icon: <ArrowRightLeft size={20} /> },
-        { name: 'Settings', path: '/settings', icon: <Settings size={20} /> },
     ];
 
     return (
@@ -37,6 +36,10 @@ export default function Sidebar() {
             </div>
             
             <div className={styles.profileSection}>
+                <Link to="/settings" className={styles.navItem}>
+                    <Settings size={20} />
+                    <span>Settings</span>
+                </Link>
                 <Link to="/profile" className={styles.navItem}>
                     <User size={20} />
                     <span>My Profile</span>

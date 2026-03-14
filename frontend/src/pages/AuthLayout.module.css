@@ -1,0 +1,151 @@
+.authBackground {
+    background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.glassCard {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    width: 100%;
+    max-width: 28rem; /* max-w-md */
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.formGroup {
+    margin-bottom: 1.25rem;
+}
+
+.label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.inputField {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.inputField:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.submitBtn {
+    width: 100%;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+.submitBtn:hover {
+    background-color: #1d4ed8;
+}
+
+.submitBtn:active {
+    transform: scale(0.98);
+}
+
+.dividerContainer {
+    position: relative;
+    margin: 1.5rem 0;
+}
+
+.dividerLine {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+}
+
+.line {
+    width: 100%;
+    border-top: 1px solid #d1d5db;
+}
+
+.dividerTextWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    font-size: 0.875rem;
+}
+
+.dividerText {
+    padding: 0 0.5rem;
+    background-color: white;
+    color: #6b7280;
+}
+
+.socialGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.socialBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.socialBtn:hover {
+    background-color: #f9fafb;
+}
+
+.socialIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+.footerText {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-top: 2rem;
+}
+
+.linkText {
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.linkText:hover {
+    text-decoration: underline;
+}

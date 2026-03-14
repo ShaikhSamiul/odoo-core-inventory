@@ -1,4 +1,4 @@
-const Product = require('../models/product'); // Ensure the P is capital if your filename is capital!
+const Product = require('../models/Product'); // Ensure the P is capital if your filename is capital!
 
 exports.getAllProducts = async (req, res) => {
     try {

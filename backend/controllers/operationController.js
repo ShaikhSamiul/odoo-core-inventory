@@ -1,6 +1,6 @@
 // backend/controllers/operationController.js
 const Operation = require('../models/Operation');
-const Product = require('../models/product');
+const Product = require('../models/Product');
 
 exports.getDashboardData = async (req, res) => {
     try {

@@ -84,21 +84,17 @@ export default function Login() {
 
                 <div className={styles.dividerContainer}>
                     <div className={styles.dividerLine}><span className={styles.line}></span></div>
-                    <div className={styles.dividerTextWrapper}>
+                    {/* <div className={styles.dividerTextWrapper}>
                         <span className={styles.dividerText}>Or continue with</span>
-                    </div>
+                    </div> */}
                 </div>
-
+{/* 
                 <div className={styles.socialGrid}>
                     <button type="button" className={styles.socialBtn}>
                         <img src="https://www.svgrepo.com/show/355037/google.svg" className={styles.socialIcon} alt="Google" />
                         <span>Google</span>
                     </button>
-                    <button type="button" className={styles.socialBtn}>
-                        <img src="https://www.svgrepo.com/show/443329/brand-apple.svg" className={styles.socialIcon} alt="Apple" />
-                        <span>Apple</span>
-                    </button>
-                </div>
+                </div> */}
 
                 <p className={styles.footerText}>
                     Don't have an account?{' '}

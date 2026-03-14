@@ -1,29 +1,22 @@
-// frontend/src/pages/Operations.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus } from 'lucide-react';
+import { Plus, Download } from 'lucide-react';
 import styles from './Products.module.css';
 
 export default function Operations() {
     const [operations, setOperations] = useState([]);
     const [products, setProducts] = useState([]);
-    const [warehouses, setWarehouses] = useState([]); // NEW: State for Warehouses
+    const [warehouses, setWarehouses] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     const [formData, setFormData] = useState({
-        type: 'Receipt',
-        product: '',
-        quantity: 1,
-        fromLocation: 'Vendor',
-        toLocation: '', // Will map to a Warehouse ID
-        status: 'Done',
-        reference: ''
+        type: 'Receipt', product: '', quantity: 1, fromLocation: 'Vendor', toLocation: '', status: 'Done', reference: ''
     });
 
     useEffect(() => {
         fetchOperations();
         fetchProducts();
-        fetchWarehouses(); // NEW: Fetch warehouses on load
+        fetchWarehouses();
     }, []);
 
     const fetchOperations = async () => {
@@ -47,7 +40,6 @@ export default function Operations() {
         }
     };
 
-    // NEW: Fetch Warehouses
     const fetchWarehouses = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/warehouses');
@@ -60,19 +52,44 @@ export default function Operations() {
         }
     };
 
-    // Dynamically handle form changes to reset From/To fields based on type
+    // --- CSV DOWNLOAD LOGIC ---
+    const downloadCSV = () => {
+        if (!operations || operations.length === 0) {
+            alert("No data available to download");
+            return;
+        }
+
+        const headers = ["Date", "Type", "Reference", "Product", "Warehouse", "Quantity", "Status"];
+        
+        const rows = operations.map(op => [
+            `"${new Date(op.createdAt).toLocaleString()}"`,
+            `"${op.type}"`,
+            `"${op.reference || 'N/A'}"`,
+            `"${op.product?.name || 'Unknown'}"`,
+            `"${op.product?.warehouse?.name || 'N/A'}"`,
+            `"${op.type === 'Delivery' ? '-' : '+'}${op.quantity}"`,
+            `"${op.status}"`
+        ].join(","));
+
+        const csvContent = [headers.join(","), ...rows].join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Operations_Ledger_${new Date().toLocaleDateString()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const handleTypeChange = (e) => {
         const newType = e.target.value;
         const defaultWh = warehouses.length > 0 ? warehouses[0]._id : '';
-        
-        let from = '';
-        let to = '';
-
+        let from = ''; let to = '';
         if (newType === 'Receipt') { from = 'Vendor'; to = defaultWh; }
         else if (newType === 'Delivery') { from = defaultWh; to = 'Customer'; }
         else if (newType === 'Internal') { from = defaultWh; to = defaultWh; }
         else if (newType === 'Adjustment') { from = defaultWh; to = 'N/A'; }
-
         setFormData({ ...formData, type: newType, fromLocation: from, toLocation: to });
     };
 
@@ -85,22 +102,14 @@ export default function Operations() {
         try {
             await axios.post('http://localhost:5000/api/operations', formData);
             fetchOperations();
-            fetchProducts(); // Refresh products to show updated stock!
+            fetchProducts();
             setIsModalOpen(false);
-            
             setFormData({
-                type: 'Receipt',
-                product: products[0]?._id || '',
-                quantity: 1,
-                fromLocation: 'Vendor',
-                toLocation: warehouses[0]?._id || '',
-                status: 'Done',
-                reference: ''
+                type: 'Receipt', product: products[0]?._id || '', quantity: 1, fromLocation: 'Vendor',
+                toLocation: warehouses[0]?._id || '', status: 'Done', reference: ''
             });
-            
             alert("Operation logged successfully!");
         } catch (error) {
-            console.error("Error saving operation:", error);
             alert(error.response?.data?.message || "Failed to save operation.");
         }
     };
@@ -113,9 +122,14 @@ export default function Operations() {
         <div>
             <div className={styles.pageHeader}>
                 <h1 className={styles.pageTitle}>Inventory Ledger (Operations)</h1>
-                <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
-                    <Plus size={20} /> Log New Operation
-                </button>
+                <div className="flex gap-3">
+                    <button className={styles.cancelBtn} onClick={downloadCSV} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f8fafc' }}>
+                        <Download size={18} /> Download Ledger
+                    </button>
+                    <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
+                        <Plus size={20} /> Log New Operation
+                    </button>
+                </div>
             </div>
 
             <div className={styles.tableContainer}>
@@ -139,7 +153,7 @@ export default function Operations() {
                                 <td>{op.reference || '-'}</td>
                                 <td className="text-blue-600 font-medium">{op.product?.name}</td>
                                 <td className="text-gray-600">{op.product?.warehouse?.name || 'Unknown'}</td>
-                                <td className="font-bold">{op.type === 'Delivery' || op.type === 'Adjustment' && op.quantity < 0 ? '-' : '+'}{Math.abs(op.quantity)}</td>
+                                <td className="font-bold">{op.type === 'Delivery' || (op.type === 'Adjustment' && op.quantity < 0) ? '-' : '+'}{Math.abs(op.quantity)}</td>
                                 <td>
                                     <span className={`px-2 py-1 rounded text-xs font-bold ${op.status === 'Done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                         {op.status}
@@ -151,11 +165,11 @@ export default function Operations() {
                 </table>
             </div>
 
+            {/* Modal code remains exactly the same as provided in your prompt */}
             {isModalOpen && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent} style={{ maxWidth: '600px' }}>
                         <h2 className={styles.modalTitle}>Process Inventory Movement</h2>
-                        
                         <form onSubmit={handleSubmit}>
                             <div className="flex gap-4 mb-4">
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
@@ -173,10 +187,10 @@ export default function Operations() {
                                         <option value="Done">Done (Updates Stock)</option>
                                         <option value="Draft">Draft (No Change)</option>
                                         <option value="Waiting">Waiting (No Change)</option>
+                                        <option value="Ready">Ready</option>
                                     </select>
                                 </div>
                             </div>
-
                             <div className={styles.formGroup}>
                                 <label>Select Product</label>
                                 <select name="product" value={formData.product} onChange={handleInputChange} className={styles.formInput} required>
@@ -187,7 +201,6 @@ export default function Operations() {
                                     ))}
                                 </select>
                             </div>
-
                             <div className="flex gap-4 mb-4">
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>Quantity</label>
@@ -198,8 +211,6 @@ export default function Operations() {
                                     <input type="text" name="reference" value={formData.reference} onChange={handleInputChange} className={styles.formInput} placeholder="e.g. PO-9923" />
                                 </div>
                             </div>
-
-                            {/* DYNAMIC FROM/TO LOCATIONS */}
                             <div className="flex gap-4 mb-4">
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>From Location</label>
@@ -212,7 +223,6 @@ export default function Operations() {
                                         </select>
                                     )}
                                 </div>
-                                
                                 <div className={`${styles.formGroup} flex-1 mb-0`}>
                                     <label>To Location</label>
                                     {formData.type === 'Delivery' ? (
@@ -227,7 +237,6 @@ export default function Operations() {
                                     )}
                                 </div>
                             </div>
-
                             <div className={styles.modalActions}>
                                 <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>Cancel</button>
                                 <button type="submit" className={styles.addButton}>Process Operation</button>

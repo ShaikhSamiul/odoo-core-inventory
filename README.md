@@ -1,2 +1,77 @@
-Based on the project documentation provided, here are the complete details of the Core Inventory project:Problem StatementThe goal is to build a modular Inventory Management System (IMS) that digitizes and streamlines all stock-related operations within a business. It aims to replace manual registers, Excel sheets, and scattered tracking methods with a centralized, real-time, easy-to-use app.Target UsersInventory Managers: Manage incoming and outgoing stock.Warehouse Staff: Perform transfers, picking, shelving, and counting.Authentication FlowUsers can sign up and log in.It includes an OTP-based password reset feature.Upon login, users are redirected to the Inventory Dashboard.Core Features & Navigation SectionsThe application is structured around a central navigation sidebar with the following sections:1. Dashboard
-The landing page shows a snapshot of inventory operations.KPIs: Displays Total Products in Stock, Low Stock / Out of Stock Items, Pending Receipts, Pending Deliveries, and Internal Transfers Scheduled.Dynamic Filters: Filter data by document type, status (Draft, Waiting, Ready, Done, Canceled), warehouse/location, and product category.2. Products ManagementCreate and update products with details like Name, SKU/Code, Category, Unit of Measure, and optional initial stock.Track stock availability per location.Set up product categories and reordering rules.3. OperationsThis is the central hub for the inventory ledger, handling:Receipts (Incoming Goods): Used when items arrive from vendors. You create a receipt, add the supplier and products, input quantities, and upon validation, the stock increases automatically.Delivery Orders (Outgoing Goods): Used when stock leaves the warehouse for customer shipment. Process involves picking, packing, and validating, which automatically decreases stock.Internal Transfers: Used to move stock inside the company (e.g., Main Warehouse to Production Floor). Each movement is logged in the ledger.Stock Adjustments: Fixes mismatches between the recorded system stock and the actual physical count. You select the product/location, enter the counted quantity, and the system auto-updates and logs the adjustment.Move History: A log of all inventory movements.4. Settings & ProfileSettings: Configure elements like the Warehouse.Profile Menu: Contains options for "My Profile" and "Logout".Additional FeaturesAlerts for low stock levels.Multi-warehouse support.SKU search and smart filters.
+# 📦 Core Inventory Management System (IMS)
+
+Core Inventory is a modern, enterprise-grade Inventory Management System built with the MERN stack. Designed to replace manual registers and spreadsheets, it digitizes stock-related operations, providing a centralized, real-time, and highly intuitive application. 
+
+The UI/UX is heavily inspired by modern ERP systems (like Odoo), moving away from clunky pop-ups in favor of seamless **List-to-Sheet document views**, visual status pipelines, and dynamic stock ledger math.
+
+---
+
+## ✨ System Architecture & UI Philosophy
+
+### The "Sheet" Layout
+Instead of basic modals, Core Inventory utilizes a professional ERP Document Sheet architecture:
+* **List View:** A clean, segmented data table displaying all active operations.
+* **Form View (The Sheet):** Clicking an operation replaces the screen with a detailed document. This includes top-left action buttons (Validate, Draft), a top-right visual Status Pipeline (`Draft > Waiting > Ready > Done`), primary fields, and a dynamic sub-table for product line items.
+
+### Custom Design System
+* **Segmented Tabs:** Smooth, inline pill-shaped tab controls for switching between Receipts, Deliveries, and Adjustments.
+* **Modern Pill Buttons:** Custom-built primary (`btnBlue`), secondary (`btnWhite`), and draft (`btnDark`) actions with smooth hover lifts and drop shadows.
+* **Scoped CSS:** Built strictly using React CSS Modules (`.module.css`) to ensure styles never leak across components.
+
+---
+
+## 🚀 Key Features & Modules
+
+### 1. 📊 Dashboard & KPIs
+* **Real-time Metrics:** Snapshot of Total Products, Low/Out of Stock items, and scheduled movements.
+* **Smart Filters:** Filter operations by Document Type, Status, Warehouse, and Category.
+
+### 2. 🛍️ Master Product Catalog
+* **Product Details:** Manage items with Name, SKU, Category, and Unit of Measure (UOM).
+* **Live Stock Tracking:** Real-time stock availability tracking that updates instantly based on ledger validations.
+* **Reordering Rules:** Set minimum thresholds to trigger low-stock alerts.
+
+### 3. 🔄 Operations (The Dynamic Ledger)
+The core engine of the app. It tracks where stock comes from, where it goes, and calculates the math safely on the backend.
+* **Smart Sequence IDs:** The backend automatically generates and assigns readable, sequential IDs based on the operation type (e.g., `WH/IN/0001` for Receipts, `WH/OUT/0002` for Deliveries).
+* **Receipts (Incoming):** Receive goods from vendors. Validating a receipt automatically *increases* product stock.
+* **Delivery Orders (Outgoing):** Ship products to customers. Validating a delivery automatically *deducts* from product stock. Prevents delivery if stock is insufficient.
+* **Inventory Adjustments:** Fix discrepancies between recorded stock and physical counts by hard-setting the correct quantity.
+* **Demand vs. Done:** Line items track both the requested quantity (`Demand`) and the actual processed quantity (`Done`). Only the `Done` quantity affects the final stock math.
+
+### 4. 🔐 Security & Roles
+* Secure Login / Signup for Warehouse Staff and Inventory Managers.
+* OTP-based password recovery flow.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend:** React.js, React Router DOM, CSS Modules, Lucide React (Icons).
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB (Mongoose ODM)
+* **HTTP Client:** Axios
+
+---
+
+## 📂 Project Structure
+
+```text
+core-inventory/
+├── backend/
+│   ├── config/           # Database connection
+│   ├── controllers/      # Business logic & stock math (operationController.js)
+│   ├── models/           # Mongoose schemas (Product.js, Operation.js)
+│   ├── routes/           # API routes (/api/operations, /api/products)
+│   ├── .env              # Backend environment variables
+│   └── server.js         # Entry point
+│
+└── frontend/
+    ├── src/
+    │   ├── components/   # Reusable UI (Sidebar, Layout)
+    │   ├── pages/        # Main views (Dashboard, Products, Operations.jsx)
+    │   ├── App.jsx       # Routing logic
+    │   └── index.css     # Global styles & Tailwind resets
+    ├── package.json
+    └── vite.config.js
+

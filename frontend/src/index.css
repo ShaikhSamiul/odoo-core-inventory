@@ -1,0 +1,20 @@
+/* frontend/src/index.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f4f7fe; /* Very clean, light grayish-blue background */
+  color: #1e293b;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  text-align: left; /* Fixes the weird centering */
+}

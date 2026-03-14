@@ -71,7 +71,7 @@ cd core-inventory
 2. Backend Setup
 Open a terminal and navigate to the backend folder:
 ```
-Bash
+bash
 cd backend
 npm install
 ```
@@ -85,20 +85,20 @@ JWT_SECRET=your_super_secret_key
 ```
 Start the backend server:
 ```
-Bash
+bash
 npm run dev
 ```
 # Server should log: "Server running on port 5000"
 3. Frontend Setup
 Open a new terminal window and navigate to the frontend folder:
 ```
-Bash
+bash
 cd frontend
 npm install
 ```
 Start the frontend development server:
 ```
-Bash
+bash
 npm run dev
 ```
 # App will typically run on http://localhost:5173

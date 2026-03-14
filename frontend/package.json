@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@tailwindcss/vite": "^4.2.1",
+>>>>>>> 873d2cb (Work in progress: setting up backend and database)
     "axios": "^1.13.6",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
@@ -27,7 +31,11 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "postcss": "^8.5.8",
+<<<<<<< HEAD
     "tailwindcss": "^3.4.19",
+=======
+    "tailwindcss": "^4.2.1",
+>>>>>>> 873d2cb (Work in progress: setting up backend and database)
     "vite": "^8.0.0"
   }
 }
